@@ -1,0 +1,113 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# C / C++ / CUDA build artifacts
+*.obj
+*.o
+*.lib
+*.a
+*.exp
+*.ilk
+*.pdb
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Datasets and local data (strictly prevent committing raw/processed dataset payloads)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/splits/*
+!data/splits/.gitkeep
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.arrow
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.sqlite
+*.db
+
+# Model weights, checkpoints, embeddings
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+*.engine
+*.trt
+models/weights/*
+!models/weights/.gitkeep
+checkpoints/
+saved_models/
+
+# Experiment outputs, metrics, and figures (only keep docs and gitkeeps tracked)
+results/metrics/*
+!results/metrics/.gitkeep
+results/figures/*
+!results/figures/.gitkeep
+runs/
+wandb/
+.tensorboard/
+
+# Profiling and performance traces
+*.ncu-rep
+*.nsys-rep
+*.qdrep
+*.nvvp
+*.prof
+*.pstats
+
+# Environment variables, credentials, and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Testing & Quality Assurance
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# IDE, OS, and Editor files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*.swp
