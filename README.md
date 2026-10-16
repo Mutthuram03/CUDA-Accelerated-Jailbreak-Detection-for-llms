@@ -1,11 +1,5 @@
 # CUDA-Accelerated Detection of Instruction-Conflict and Obfuscation-Based Jailbreak Prompts in Large Language Models
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-brightgreen.svg)](https://python.org)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Linux-lightgrey.svg)]()
-[![CUDA](https://img.shields.io/badge/CUDA-12.1%20%2F%2012.4%20Ready-green.svg)](https://developer.nvidia.com/cuda-zone)
-[![Status](https://img.shields.io/badge/Status-Phase%201%3A%20Environment%20%26%20Setup%20Verified-blue.svg)]()
-
 A research framework and evaluation harness dedicated to high-throughput, low-latency detection of instruction-conflict and obfuscation-based adversarial jailbreak prompts targeting Large Language Models (LLMs).
 
 ---
