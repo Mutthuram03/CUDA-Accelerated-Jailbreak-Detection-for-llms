@@ -1,0 +1,20 @@
+# Baseline TF-IDF + Logistic Regression Configuration
+model:
+  type: "tfidf_logistic_regression"
+  vectorizer:
+    ngram_range: [1, 2]
+    max_features: 20000
+    sublinear_tf: true
+    min_df: 2
+  classifier:
+    C: 1.0
+    penalty: "l2"
+    solver: "lbfgs"
+    max_iter: 1000
+    class_weight: "balanced"
+    random_state: 42
+
+benchmarking:
+  batch_sizes: [1, 8, 16, 32, 64, 128]
+  warmup_trials: 10
+  timed_trials: 100
