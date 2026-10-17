@@ -1,0 +1,22 @@
+# Experiment Defaults Configuration
+project:
+  name: "CUDA-Accelerated Jailbreak Detection"
+  seed: 42
+
+environment:
+  num_threads: 4
+  device: "cuda"          # Fallback to cpu if cuda unavailable
+  deterministic: true
+
+dataset:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  splits_dir: "data/splits"
+  train_split: "data/splits/train.parquet"
+  val_split: "data/splits/val.parquet"
+  test_split: "data/splits/test.parquet"
+
+metrics:
+  target_fpr_threshold: 0.01  # Target False Positive Rate (e.g. 1%)
+  calculate_roc: true
+  calculate_pr_curve: true
