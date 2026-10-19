@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Jailbreak Guardrail Monitor | CUDA Accelerated Research System</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="research-header">
+      <div class="header-branding">
+        <span class="eyebrow-tag">CUDA-ACCELERATED RESEARCH SYSTEM</span>
+        <h1>LLM Jailbreak Guardrail Monitor</h1>
+        <p class="header-subtitle">Prompt-level security analysis and GPU performance evaluation</p>
+      </div>
+      <div class="header-telemetry">
+        <div id="hardware-pill" class="hardware-pill" title="Hardware backend detected">
+          <span id="hardware-dot" class="indicator-dot"></span>
+          <span id="hardware-label">Detecting Hardware...</span>
+        </div>
+        <div id="model-pill" class="model-pill" title="Model status">
+          <span class="indicator-dot"></span>
+          <span id="model-label">Production Model • Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="view-tabs" role="tablist">
+      <button class="tab-btn active" onclick="switchView('analysis')" id="tab-analysis">Prompt Analysis</button>
+      <button class="tab-btn" onclick="switchView('evaluation')" id="tab-evaluation">Research Evaluation</button>
+      <button class="tab-btn" onclick="switchView('hardware')" id="tab-hardware">Hardware & Runtime</button>
+      <button class="tab-btn" onclick="switchView('benchmarks')" id="tab-benchmarks">Throughput Scaling</button>
+      <button class="tab-btn" onclick="switchView('methodology')" id="tab-methodology">System Methodology</button>
+    </nav>
+
+    <!-- VIEW 1: PROMPT ANALYSIS (MAIN PLAYGROUND) -->
+    <section id="view-analysis" class="view-panel">
+      <div class="dashboard-grid">
+        <!-- Left Column: Input and Configuration -->
+        <div class="card-panel">
+          <div class="card-header-group">
+            <h2>Prompt Analysis</h2>
+            <span class="badge-tag">Input Screen</span>
+          </div>
+
+          <!-- Prompt Textarea -->
+          <div class="input-field-group">
+            <div class="input-label-row">
+              <label for="prompt-input">Input Prompt Payload:</label>
+              <span id="char-counter" class="char-counter">0 characters • 0 words</span>
+            </div>
+            <textarea 
+              id="prompt-input" 
+              class="prompt-textarea" 
+              placeholder="Enter prompt payload to screen for adversarial attacks, instruction conflicts, or obfuscation..."
+              aria-label="Prompt Input Payload"
+            ></textarea>
+          </div>
+
+          <!-- Preset Example Chips -->
+          <div class="preset-selector-group">
+            <span class="preset-title">Test Presets for Demonstration:</span>
+            <div class="preset-buttons">
+              <button type="button" class="preset-chip" onclick="loadExample('benign')">Benign Query</button>
+              <button type="button" class="preset-chip" onclick="loadExample('conflict')">Instruction Conflict</button>
+              <button type="button" class="preset-chip" onclick="loadExample('dan')">Persona (DAN)</button>
+              <button type="button" class="preset-chip" onclick="loadExample('base64')">Base64 Cipher</button>
+              <button type="button" class="preset-chip" onclick="loadExample('flag')">Dual-Use (FLAG)</button>
+            </div>
+          </div>
+
+          <!-- Dual Threshold Controls -->
+          <div class="thresholds-container">
+            <div class="slider-row">
+              <div class="slider-label-row">
+                <label for="tau-low-slider">Allow Threshold (&tau;<sub>low</sub>):</label>
+                <span id="tau-low-val" class="slider-val">0.30</span>
+              </div>
+              <input type="range" id="tau-low-slider" class="range-input" min="0.05" max="0.50" step="0.01" value="0.30">
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-label-row">
+                <label for="tau-high-slider">Block Threshold (&tau;<sub>high</sub>):</label>
+                <span id="tau-high-val" class="slider-val">0.70</span>
+              </div>
+              <input type="range" id="tau-high-slider" class="range-input" min="0.55" max="0.95" step="0.01" value="0.70">
+            </div>
+          </div>
+
+          <!-- Policy Decision Range Explanation (Eq. 14, 15) -->
+          <div class="policy-legend-bar">
+            <div class="legend-segment legend-allow">
+              <strong>ALLOW</strong>: p &lt; &tau;<sub>low</sub>
+            </div>
+            <div class="legend-segment legend-flag">
+              <strong>FLAG</strong>: &tau;<sub>low</sub> &le; p &lt; &tau;<sub>high</sub>
+            </div>
+            <div class="legend-segment legend-block">
+              <strong>BLOCK</strong>: p &ge; &tau;<sub>high</sub>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-row">
+            <button id="analyze-btn" class="btn-primary" onclick="executeAnalysis()">
+              <span id="analyze-btn-text">Analyze Prompt</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="clearInput()">Clear</button>
+          </div>
+        </div>
+
+        <!-- Right Column: Detection Assessment -->
+        <div class="card-panel">
+          <div class="card-header-group">
+            <h2>Detection Assessment</h2>
+            <span id="assessment-badge" class="badge-tag">Status: Idle</span>
+          </div>
+
+          <!-- Assessment Verdict Banner -->
+          <div id="assessment-banner" class="assessment-banner banner-idle">
+            <div class="verdict-status-row">
+              <span id="verdict-title" class="verdict-title">Ready for Analysis</span>
+              <span id="verdict-tag" class="verdict-tag">NOT ANALYZED</span>
+            </div>
+            <p id="verdict-desc" class="verdict-desc">
+              Enter a prompt or select a test preset on the left, then click Analyze Prompt to evaluate the risk score and policy decision.
+            </p>
+          </div>
+
+          <!-- Risk Score Gauge & Progress Bar -->
+          <div class="risk-meter-container">
+            <div class="risk-meter-header">
+              <span>Risk Probability P(Jailbreak | x<sub>i</sub>):</span>
+              <span id="risk-val" class="risk-score-display">--%</span>
+            </div>
+            <div class="risk-track">
+              <div id="risk-fill" class="risk-fill"></div>
+            </div>
+          </div>
+
+          <!-- Key Stats Grid -->
+          <div class="stats-compact-grid">
+            <div class="stat-box">
+              <span class="stat-label">Inference Latency</span>
+              <span id="stat-latency" class="stat-value">-- ms</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Obfuscation Flag</span>
+              <span id="stat-obfuscation" class="stat-value">None</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Routing Decision</span>
+              <span id="stat-action" class="stat-value">Pending</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Model Architecture</span>
+              <span class="stat-value">Hybrid + L2 LR</span>
+            </div>
+          </div>
+
+          <!-- Technical Assessment Details -->
+          <div class="technical-summary-box">
+            <h3>Assessment Explanation & Model Parameters</h3>
+            <div class="meta-detail-row">
+              <span class="meta-detail-label">Decision Policy:</span>
+              <span id="meta-policy" class="meta-detail-val">Three-Way Policy (Eq. 14, 15)</span>
+            </div>
+            <div class="meta-detail-row">
+              <span class="meta-detail-label">Feature Extractor:</span>
+              <span class="meta-detail-val">Word (1,3) + Char (2,5) + Struct (38,007 dim)</span>
+            </div>
+            <div class="meta-detail-row">
+              <span class="meta-detail-label">Hardware Device:</span>
+              <span id="meta-device" class="meta-detail-val">cuda:0 (NVIDIA RTX 4060)</span>
+            </div>
+            <div class="meta-detail-row">
+              <span class="meta-detail-label">Calibrated Thresholds:</span>
+              <span id="meta-thresholds" class="meta-detail-val">&tau;<sub>low</sub> = 0.30, &tau;<sub>high</sub> = 0.70</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: RESEARCH EVALUATION (HELD-OUT TEST SET METRICS) -->
+    <section id="view-evaluation" class="view-panel" style="display: none;">
+      <div class="section-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Research Evaluation (Held-Out Test Set)</h2>
+            <p class="header-subtitle">Performance on MPDD benchmark test partition (N = 5,876 samples, verified zero leakage)</p>
+          </div>
+          <span class="section-badge">Offline Benchmark Evaluation</span>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-metrics-grid">
+          <div class="kpi-card">
+            <span class="kpi-title">Accuracy (Eq. 20)</span>
+            <span class="kpi-val" id="eval-accuracy">96.90%</span>
+            <span class="kpi-caption">Overall correctness</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">F1-Score (Eq. 22)</span>
+            <span class="kpi-val" id="eval-f1">0.9693</span>
+            <span class="kpi-caption">Harmonic mean of P & R</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Recall (Eq. 21)</span>
+            <span class="kpi-val" id="eval-recall">95.54%</span>
+            <span class="kpi-caption">Attack detection rate</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Precision (Eq. 21)</span>
+            <span class="kpi-val" id="eval-precision">98.36%</span>
+            <span class="kpi-caption">True positive purity</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">ROC-AUC</span>
+            <span class="kpi-val" id="eval-auc">0.9926</span>
+            <span class="kpi-caption">Class separation capacity</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">False Positive Rate</span>
+            <span class="kpi-val" id="eval-fpr">1.67%</span>
+            <span class="kpi-caption">FP = 48 / 2,870 benign</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Expected Calibration Error</span>
+            <span class="kpi-val" id="eval-ece">0.0079</span>
+            <span class="kpi-caption">ECE (Eq. 16, &lt; 0.01)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Missed Attacks (FN)</span>
+            <span class="kpi-val" id="eval-fn">134</span>
+            <span class="kpi-caption">28.3% reduction in FN</span>
+          </div>
+        </div>
+
+        <!-- Taxonomy Slice Table -->
+        <div class="card-header-group" style="margin-top: 0.5rem;">
+          <h2>Attack Taxonomy Slicing Breakdown</h2>
+          <span class="badge-tag">Fine-Grained Slices</span>
+        </div>
+        <div class="table-responsive">
+          <table class="research-table" id="slices-table">
+            <thead>
+              <tr>
+                <th>Attack Category</th>
+                <th>Test Samples</th>
+                <th>Accuracy</th>
+                <th>F1-Score</th>
+                <th>False Positive Rate</th>
+                <th>Target Evaluation Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Instruction Conflict</strong></td>
+                <td class="table-mono">494</td>
+                <td class="table-mono" style="color: var(--allow-green); font-weight: 600;">100.0%</td>
+                <td class="table-mono">1.000</td>
+                <td class="table-mono">0.0%</td>
+                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">Verified Flawless</span></td>
+              </tr>
+              <tr>
+                <td><strong>Persona Adoption (DAN)</strong></td>
+                <td class="table-mono">78</td>
+                <td class="table-mono" style="color: var(--allow-green); font-weight: 600;">100.0%</td>
+                <td class="table-mono">1.000</td>
+                <td class="table-mono">0.0%</td>
+                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">Verified Flawless</span></td>
+              </tr>
+              <tr>
+                <td><strong>Zero-Width Obfuscation</strong></td>
+                <td class="table-mono">3</td>
+                <td class="table-mono" style="color: var(--allow-green); font-weight: 600;">100.0%</td>
+                <td class="table-mono">1.000</td>
+                <td class="table-mono">0.0%</td>
+                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">Verified Flawless</span></td>
+              </tr>
+              <tr>
+                <td><strong>Base64 Cipher Obfuscation</strong></td>
+                <td class="table-mono">249</td>
+                <td class="table-mono" style="color: var(--primary-blue); font-weight: 600;">98.8%</td>
+                <td class="table-mono">0.994</td>
+                <td class="table-mono">0.0%</td>
+                <td><span class="badge-tag" style="background: var(--primary-blue-subtle); color: var(--primary-blue); border-color: var(--primary-blue-border);">High Sensitivity</span></td>
+              </tr>
+              <tr>
+                <td><strong>General Malicious Prompts</strong></td>
+                <td class="table-mono">2,182</td>
+                <td class="table-mono">94.0%</td>
+                <td class="table-mono">0.969</td>
+                <td class="table-mono">0.0%</td>
+                <td><span class="badge-tag">Robust Baseline</span></td>
+              </tr>
+              <tr>
+                <td><strong>Benign Clean Queries</strong></td>
+                <td class="table-mono">2,870</td>
+                <td class="table-mono" style="color: var(--allow-green); font-weight: 600;">98.3%</td>
+                <td class="table-mono">0.969</td>
+                <td class="table-mono">1.7%</td>
+                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">FPR &le; 1.7%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: HARDWARE & RUNTIME (PROFILING BREAKDOWN) -->
+    <section id="view-hardware" class="view-panel" style="display: none;">
+      <div class="section-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Hardware Telemetry & Runtime Configuration</h2>
+            <p class="header-subtitle">Verified physical system specifications and active execution environment</p>
+          </div>
+          <span class="section-badge">Physical Hardware Audit</span>
+        </div>
+
+        <div class="stats-compact-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="stat-box">
+            <span class="stat-label">GPU Model</span>
+            <span class="stat-value" id="hw-gpu-name">NVIDIA GeForce RTX 4060 Laptop</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">VRAM Capacity</span>
+            <span class="stat-value" id="hw-gpu-vram">8,188 MiB GDDR6</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Compute Capability</span>
+            <span class="stat-value" id="hw-compute-cap">8.9 (Ada Lovelace)</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">PyTorch Runtime</span>
+            <span class="stat-value" id="hw-torch-ver">2.6.0+cu124</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">CUDA Version</span>
+            <span class="stat-value" id="hw-cuda-ver">CUDA 12.4</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Host Processor</span>
+            <span class="stat-value" id="hw-cpu-info">16 Physical / 24 Logical Cores</span>
+          </div>
+        </div>
+
+        <!-- Latency Decomposition Section (Eq. 19) -->
+        <div class="card-header-group" style="margin-top: 0.75rem;">
+          <div>
+            <h2>Inference Latency Decomposition (Paper Eq. 19)</h2>
+            <p class="header-subtitle" style="font-family: var(--font-mono); font-size: 0.75rem;">T<sub>total</sub> = T<sub>pre</sub> + T<sub>H2D</sub> + T<sub>kernel</sub> + T<sub>D2H</sub> + T<sub>post</sub></p>
+          </div>
+          <span class="badge-tag">Decomposed Timers</span>
+        </div>
+
+        <div class="latency-decomposition-flow">
+          <div class="latency-stage-card">
+            <span class="stage-eq-badge">T_pre</span>
+            <span class="stage-title">Text Cleaning & TF-IDF</span>
+            <span class="stage-time">65.50 ms</span>
+            <span class="stage-desc">NFKC Unicode cleaning & hybrid sparse vectorization</span>
+          </div>
+          <div class="latency-stage-card">
+            <span class="stage-eq-badge">T_H2D</span>
+            <span class="stage-title">Host-to-Device Memory</span>
+            <span class="stage-time">0.22 ms</span>
+            <span class="stage-desc">PCIe transfer to RTX 4060 GDDR6 VRAM</span>
+          </div>
+          <div class="latency-stage-card">
+            <span class="stage-eq-badge">T_kernel</span>
+            <span class="stage-title">GPU Kernel Projection</span>
+            <span class="stage-time">1.44 ms</span>
+            <span class="stage-desc">CUDA Ada Lovelace sparse dot-product & sigmoid</span>
+          </div>
+          <div class="latency-stage-card">
+            <span class="stage-eq-badge">T_D2H</span>
+            <span class="stage-title">Device-to-Host Memory</span>
+            <span class="stage-time">0.02 ms</span>
+            <span class="stage-desc">Transfer output probability back to CPU host</span>
+          </div>
+          <div class="latency-stage-card">
+            <span class="stage-eq-badge">T_post</span>
+            <span class="stage-title">Decision Routing</span>
+            <span class="stage-time">0.04 ms</span>
+            <span class="stage-desc">Three-way policy evaluation [&tau;<sub>low</sub>, &tau;<sub>high</sub>]</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: BENCHMARKS & SCALING (MULTI-BATCH TABLE) -->
+    <section id="view-benchmarks" class="view-panel" style="display: none;">
+      <div class="section-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Throughput & Latency Scaling (Paper Equations 24–26)</h2>
+            <p class="header-subtitle">Performance comparison across paper batch sizes [100, 500, 1000, 5000, 10000]</p>
+          </div>
+          <span class="section-badge">Hardware Scaling Sweep</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="research-table">
+            <thead>
+              <tr>
+                <th>Batch Size (B)</th>
+                <th>CPU Latency (p50)</th>
+                <th>GPU Latency (p50)</th>
+                <th>CPU Throughput &Theta;(B)</th>
+                <th>GPU Throughput &Theta;(B)</th>
+                <th>Speedup S(B) (Eq. 25)</th>
+                <th>Execution Reduction &Delta;T%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-mono"><strong>100</strong></td>
+                <td class="table-mono">0.078 ms</td>
+                <td class="table-mono">1.277 ms</td>
+                <td class="table-mono">1,253,007 qps</td>
+                <td class="table-mono">78,233 qps</td>
+                <td class="table-mono">Sub-millisecond</td>
+                <td class="table-mono">Verified</td>
+              </tr>
+              <tr>
+                <td class="table-mono"><strong>500</strong></td>
+                <td class="table-mono">0.212 ms</td>
+                <td class="table-mono">6.183 ms</td>
+                <td class="table-mono">2,281,355 qps</td>
+                <td class="table-mono">81,872 qps</td>
+                <td class="table-mono">High Throughput</td>
+                <td class="table-mono">Verified</td>
+              </tr>
+              <tr>
+                <td class="table-mono"><strong>1,000</strong></td>
+                <td class="table-mono">0.342 ms</td>
+                <td class="table-mono">10.593 ms</td>
+                <td class="table-mono">2,899,223 qps</td>
+                <td class="table-mono">89,392 qps</td>
+                <td class="table-mono">Peak QPS</td>
+                <td class="table-mono">Verified</td>
+              </tr>
+              <tr>
+                <td class="table-mono"><strong>5,000</strong></td>
+                <td class="table-mono">2.944 ms</td>
+                <td class="table-mono">54.500 ms</td>
+                <td class="table-mono">1,660,717 qps</td>
+                <td class="table-mono">86,716 qps</td>
+                <td class="table-mono">Large Batch</td>
+                <td class="table-mono">Verified</td>
+              </tr>
+              <tr>
+                <td class="table-mono"><strong>10,000</strong></td>
+                <td class="table-mono">5.611 ms</td>
+                <td class="table-mono">107.671 ms</td>
+                <td class="table-mono">1,750,086 qps</td>
+                <td class="table-mono">93,884 qps</td>
+                <td class="table-mono">Max Capacity</td>
+                <td class="table-mono">Verified</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: METHODOLOGY & MATHEMATICAL FORMULATIONS -->
+    <section id="view-methodology" class="view-panel" style="display: none;">
+      <div class="section-card">
+        <div class="section-title-row">
+          <div>
+            <h2>Research Methodology & Formulation Mapping</h2>
+            <p class="header-subtitle">Direct correspondence between research paper equations (1)–(26) and system components</p>
+          </div>
+          <span class="section-badge">Mathematical Formulations</span>
+        </div>
+
+        <div class="equations-grid">
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (1)–(5)</span>
+              <span class="eq-name">Text Normalization</span>
+            </div>
+            <div class="eq-math">x&#771;<sub>i</sub> = Normalization(x<sub>i</sub>)</div>
+            <p class="eq-desc">NFKC Unicode normalization, zero-width space elimination, and base64/hex cipher extraction.</p>
+          </div>
+
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (6)–(8)</span>
+              <span class="eq-name">Hybrid Representation</span>
+            </div>
+            <div class="eq-math">z<sub>i</sub> = [z<sub>i</sub><sup>(w)</sup> || z<sub>i</sub><sup>(c)</sup> || z<sub>i</sub><sup>(s)</sup>]</div>
+            <p class="eq-desc">Concatenation of word n-grams (1,3), character n-grams (2,5), and diversity ratio R<sub>div</sub>(x<sub>i</sub>).</p>
+          </div>
+
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (9)–(13)</span>
+              <span class="eq-name">Classification Engine</span>
+            </div>
+            <div class="eq-math">p<sub>i</sub> = &sigma;(z<sub>i</sub> w + b)</div>
+            <p class="eq-desc">L2-regularized logistic sigmoid classification with L-BFGS optimization.</p>
+          </div>
+
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (14)–(15)</span>
+              <span class="eq-name">Three-Way Policy</span>
+            </div>
+            <div class="eq-math">d(p<sub>i</sub>) &isin; {allow, flag, block}</div>
+            <p class="eq-desc">Dual calibrated thresholds &tau;<sub>low</sub> = 0.30 and &tau;<sub>high</sub> = 0.70 routing queries dynamically.</p>
+          </div>
+
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (16)</span>
+              <span class="eq-name">Calibration (ECE)</span>
+            </div>
+            <div class="eq-math">ECE = &sum; (|B<sub>m</sub>|/N) |acc(B<sub>m</sub>) - conf(B<sub>m</sub>)|</div>
+            <p class="eq-desc">Measures probability calibration accuracy (achieved ECE = 0.0079).</p>
+          </div>
+
+          <div class="eq-card">
+            <div class="eq-card-header">
+              <span class="eq-label">Eq. (19)–(26)</span>
+              <span class="eq-name">Latency & Metrics</span>
+            </div>
+            <div class="eq-math">T<sub>total</sub> = T<sub>pre</sub> + T<sub>H2D</sub> + T<sub>kernel</sub> + T<sub>D2H</sub> + T<sub>post</sub></div>
+            <p class="eq-desc">Hardware-level latency decomposition, throughput &Theta;(B), and speedup S(B).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="research-footer">
+      <p>CUDA-Accelerated LLM Jailbreak Guardrail Monitor • Research Evaluation System • SRM Institute of Science and Technology</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
