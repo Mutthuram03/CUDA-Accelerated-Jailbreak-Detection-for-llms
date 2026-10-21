@@ -1,20 +1,38 @@
 # Baseline TF-IDF + Logistic Regression Configuration
+# Aligned with research paper equations (6)-(16) and (20)-(26)
 model:
-  type: "tfidf_logistic_regression"
+  type: "hybrid_logistic_regression"
+  feature_mode: "hybrid"  # Combines word, char, and structural signals (Eq. 6-8)
   vectorizer:
-    ngram_range: [1, 2]
-    max_features: 20000
+    ngram_range: [1, 3]
+    max_features: 30000
     sublinear_tf: true
     min_df: 2
+  char_vectorizer:
+    ngram_range: [2, 5]
+    max_features: 8000
+    min_df: 2
+  structural_features:
+    include_diversity_ratio: true  # R_div(x_i) (Eq. 8)
+    include_length: true
+    include_entropy: true
+    include_conflict_patterns: true
   classifier:
-    C: 1.0
+    C: 5.0  # L2 regularization: L_reg = L(theta) + lambda ||w||_2^2 (Eq. 13)
     penalty: "l2"
     solver: "lbfgs"
     max_iter: 1000
-    class_weight: "balanced"
+    class_weight: null
     random_state: 42
 
+  decision_policy:
+    # Three-way risk decision policy (Eq. 14, 15): allow < tau_low <= flag < tau_high <= block
+    tau_low: 0.30
+    tau_high: 0.70
+
 benchmarking:
-  batch_sizes: [1, 8, 16, 32, 64, 128]
-  warmup_trials: 10
-  timed_trials: 100
+  # Batch sizes explicitly specified in paper Section III-H
+  batch_sizes: [100, 500, 1000, 5000, 10000]
+  warmup_trials: 5
+  timed_trials: 25
+
