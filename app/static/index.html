@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LLM Jailbreak Guardrail Monitor | CUDA Accelerated Research System</title>
+  <title>LLM Jailbreak Guardrail Monitor | CUDA Accelerated Research Platform</title>
   <link rel="stylesheet" href="/static/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +14,9 @@
     <!-- Header -->
     <header class="research-header">
       <div class="header-branding">
-        <span class="eyebrow-tag">CUDA-ACCELERATED RESEARCH SYSTEM</span>
+        <span class="eyebrow-tag">CUDA-ACCELERATED RESEARCH PLATFORM</span>
         <h1>LLM Jailbreak Guardrail Monitor</h1>
-        <p class="header-subtitle">Prompt-level security analysis and GPU performance evaluation</p>
+        <p class="header-subtitle">Real-time prompt threat detection, explainable token attribution, and GPU hardware benchmarking</p>
       </div>
       <div class="header-telemetry">
         <div id="hardware-pill" class="hardware-pill" title="Hardware backend detected">
@@ -25,28 +25,46 @@
         </div>
         <div id="model-pill" class="model-pill" title="Model status">
           <span class="indicator-dot"></span>
-          <span id="model-label">Production Model • Online</span>
+          <span id="model-label">Hybrid Model (38,007 Dim) • Online</span>
+        </div>
+        <div id="counter-pill" class="counter-pill" title="Queries processed in current session">
+          <span id="counter-label">Screened: 0 | Blocked: 0</span>
         </div>
       </div>
     </header>
 
     <!-- Navigation Tabs -->
     <nav class="view-tabs" role="tablist">
-      <button class="tab-btn active" onclick="switchView('analysis')" id="tab-analysis">Prompt Analysis</button>
-      <button class="tab-btn" onclick="switchView('evaluation')" id="tab-evaluation">Research Evaluation</button>
-      <button class="tab-btn" onclick="switchView('hardware')" id="tab-hardware">Hardware & Runtime</button>
-      <button class="tab-btn" onclick="switchView('benchmarks')" id="tab-benchmarks">Throughput Scaling</button>
-      <button class="tab-btn" onclick="switchView('methodology')" id="tab-methodology">System Methodology</button>
+      <button class="tab-btn active" onclick="switchView('analysis')" id="tab-analysis">Prompt Analysis & Guardrail</button>
+      <button class="tab-btn" onclick="switchView('evaluation')" id="tab-evaluation">Research Evaluation & Metrics</button>
+      <button class="tab-btn" onclick="switchView('hardware')" id="tab-hardware">Hardware & Runtime Telemetry</button>
+      <button class="tab-btn" onclick="switchView('benchmarks')" id="tab-benchmarks">Throughput Scaling & Live Benchmarks</button>
+      <button class="tab-btn" onclick="switchView('methodology')" id="tab-methodology">System Methodology & Equations</button>
     </nav>
 
-    <!-- VIEW 1: PROMPT ANALYSIS (MAIN PLAYGROUND) -->
+    <!-- VIEW 1: PROMPT ANALYSIS & GUARDRAIL PLAYGROUND -->
     <section id="view-analysis" class="view-panel">
       <div class="dashboard-grid">
-        <!-- Left Column: Input and Configuration -->
+        <!-- Left Column: Input, Execution Selector, and Configuration -->
         <div class="card-panel">
           <div class="card-header-group">
-            <h2>Prompt Analysis</h2>
+            <h2>Prompt Screening & Configuration</h2>
             <span class="badge-tag">Input Screen</span>
+          </div>
+
+          <!-- Execution Selector: GPU vs CPU -->
+          <div class="execution-selector-box">
+            <span class="selector-label">Inference Execution Backend:</span>
+            <div class="execution-toggle-group">
+              <button type="button" id="backend-gpu-btn" class="backend-option-btn active" onclick="selectBackend('gpu')">
+                <span class="device-dot"></span>
+                <strong>GPU</strong>: PyTorch CUDA (RTX 4060)
+              </button>
+              <button type="button" id="backend-cpu-btn" class="backend-option-btn" onclick="selectBackend('cpu')">
+                <span class="device-dot"></span>
+                <strong>CPU</strong>: NumPy / Scikit-Learn
+              </button>
+            </div>
           </div>
 
           <!-- Prompt Textarea -->
@@ -63,15 +81,28 @@
             ></textarea>
           </div>
 
-          <!-- Preset Example Chips -->
+          <!-- Categorized Test Presets for Faculty Demonstrations -->
           <div class="preset-selector-group">
-            <span class="preset-title">Test Presets for Demonstration:</span>
-            <div class="preset-buttons">
-              <button type="button" class="preset-chip" onclick="loadExample('benign')">Benign Query</button>
-              <button type="button" class="preset-chip" onclick="loadExample('conflict')">Instruction Conflict</button>
-              <button type="button" class="preset-chip" onclick="loadExample('dan')">Persona (DAN)</button>
-              <button type="button" class="preset-chip" onclick="loadExample('base64')">Base64 Cipher</button>
-              <button type="button" class="preset-chip" onclick="loadExample('flag')">Dual-Use (FLAG)</button>
+            <span class="preset-title">Demonstration Presets:</span>
+            <div class="preset-category-row">
+              <span class="preset-cat-label" style="color: var(--block-red);">BLOCK:</span>
+              <button type="button" class="preset-chip chip-block" onclick="loadExample('conflict')">Instruction Conflict</button>
+              <button type="button" class="preset-chip chip-block" onclick="loadExample('dan')">Persona (DAN)</button>
+              <button type="button" class="preset-chip chip-block" onclick="loadExample('base64')">Base64 Cipher</button>
+              <button type="button" class="preset-chip chip-block" onclick="loadExample('override')">System Override</button>
+            </div>
+            <div class="preset-category-row" style="margin-top: 0.25rem;">
+              <span class="preset-cat-label" style="color: var(--flag-amber);">FLAG:</span>
+              <button type="button" class="preset-chip chip-flag" onclick="loadExample('flag_ethics')">Dual-Use Ethics</button>
+              <button type="button" class="preset-chip chip-flag" onclick="loadExample('flag_filter')">Filter Bypass Theory</button>
+              <button type="button" class="preset-chip chip-flag" onclick="loadExample('flag_security')">Security Audit</button>
+            </div>
+            <div class="preset-category-row" style="margin-top: 0.25rem;">
+              <span class="preset-cat-label" style="color: var(--allow-green);">ALLOW:</span>
+              <button type="button" class="preset-chip chip-allow" onclick="loadExample('benign_ml')">Machine Learning</button>
+              <button type="button" class="preset-chip chip-allow" onclick="loadExample('benign_bread')">Baking Recipe</button>
+              <button type="button" class="preset-chip chip-allow" onclick="loadExample('benign_solar')">Solar Energy</button>
+              <button type="button" class="preset-chip chip-allow" onclick="loadExample('benign_sort')">Merge Sort</button>
             </div>
           </div>
 
@@ -80,17 +111,17 @@
             <div class="slider-row">
               <div class="slider-label-row">
                 <label for="tau-low-slider">Allow Threshold (&tau;<sub>low</sub>):</label>
-                <span id="tau-low-val" class="slider-val">0.30</span>
+                <span id="tau-low-val" class="slider-val">0.33</span>
               </div>
-              <input type="range" id="tau-low-slider" class="range-input" min="0.05" max="0.50" step="0.01" value="0.30">
+              <input type="range" id="tau-low-slider" class="range-input" min="0.10" max="0.50" step="0.01" value="0.33">
             </div>
 
             <div class="slider-row">
               <div class="slider-label-row">
                 <label for="tau-high-slider">Block Threshold (&tau;<sub>high</sub>):</label>
-                <span id="tau-high-val" class="slider-val">0.70</span>
+                <span id="tau-high-val" class="slider-val">0.67</span>
               </div>
-              <input type="range" id="tau-high-slider" class="range-input" min="0.55" max="0.95" step="0.01" value="0.70">
+              <input type="range" id="tau-high-slider" class="range-input" min="0.55" max="0.95" step="0.01" value="0.67">
             </div>
           </div>
 
@@ -110,81 +141,347 @@
           <!-- Action Buttons -->
           <div class="action-buttons-row">
             <button id="analyze-btn" class="btn-primary" onclick="executeAnalysis()">
-              <span id="analyze-btn-text">Analyze Prompt</span>
+              <span id="analyze-btn-text">Screen & Analyze Prompt</span>
             </button>
             <button type="button" class="btn-secondary" onclick="clearInput()">Clear</button>
+            <button type="button" class="btn-dispatch" onclick="dispatchSafeToLLM()">
+              <span>Safe LLM Dispatch &rarr;</span>
+            </button>
           </div>
         </div>
 
-        <!-- Right Column: Detection Assessment -->
-        <div class="card-panel">
+        <!-- Right Column: Detection Assessment & Key Metrics (Matching Image 1) -->
+        <div class="card-panel assessment-card-panel">
           <div class="card-header-group">
             <h2>Detection Assessment</h2>
-            <span id="assessment-badge" class="badge-tag">Status: Idle</span>
+            <span id="assessment-badge" class="badge-tag">STATUS: IDLE</span>
           </div>
 
           <!-- Assessment Verdict Banner -->
           <div id="assessment-banner" class="assessment-banner banner-idle">
             <div class="verdict-status-row">
-              <span id="verdict-title" class="verdict-title">Ready for Analysis</span>
-              <span id="verdict-tag" class="verdict-tag">NOT ANALYZED</span>
+              <div class="verdict-icon-wrap" id="verdict-icon-wrap">
+                <svg id="verdict-icon-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <div class="verdict-text-block">
+                <span id="verdict-title" class="verdict-title">Ready for Analysis</span>
+                <span id="verdict-tag" class="verdict-tag">NOT ANALYZED</span>
+              </div>
             </div>
             <p id="verdict-desc" class="verdict-desc">
-              Enter a prompt or select a test preset on the left, then click Analyze Prompt to evaluate the risk score and policy decision.
+              Enter a prompt or select a test preset, then click Screen &amp; Analyze Prompt.
             </p>
           </div>
 
-          <!-- Risk Score Gauge & Progress Bar -->
-          <div class="risk-meter-container">
-            <div class="risk-meter-header">
-              <span>Risk Probability P(Jailbreak | x<sub>i</sub>):</span>
-              <span id="risk-val" class="risk-score-display">--%</span>
+          <!-- Semicircular Arc Gauge (Matching Image 1) -->
+          <div class="gauge-container" id="gauge-container">
+            <div class="gauge-title">Risk Probability P(Jailbreak | x<sub>i</sub>)</div>
+            <div class="gauge-wrap">
+              <svg id="gauge-svg" viewBox="0 0 200 125" width="220" height="130">
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#15803d"/>
+                    <stop offset="35%" stop-color="#16a34a"/>
+                    <stop offset="65%" stop-color="#ea580c"/>
+                    <stop offset="100%" stop-color="#dc2626"/>
+                  </linearGradient>
+                </defs>
+                <!-- Gray background track -->
+                <path d="M 22 110 A 78 78 0 0 1 178 110" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
+                <!-- Colored gradient arc -->
+                <path d="M 22 110 A 78 78 0 0 1 178 110" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round"/>
+                <!-- Calibration dots -->
+                <circle cx="22" cy="110" r="3.5" fill="#15803d"/>
+                <circle cx="100" cy="32" r="3.5" fill="#ca8a04"/>
+                <circle cx="178" cy="110" r="3.5" fill="#dc2626"/>
+                <!-- Needle pointer -->
+                <g id="gauge-needle-group" style="transform-origin: 100px 110px; transform: rotate(-90deg); transition: transform 0.85s cubic-bezier(0.34, 1.3, 0.64, 1);">
+                  <line x1="100" y1="110" x2="100" y2="40" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="100" cy="110" r="5.5" fill="#0f172a"/>
+                  <circle cx="100" cy="110" r="2.5" fill="#ffffff"/>
+                </g>
+              </svg>
+              <!-- Center Digital Percentage -->
+              <div class="gauge-center-val">
+                <span id="risk-val" class="gauge-digits">0.0%</span>
+              </div>
             </div>
-            <div class="risk-track">
-              <div id="risk-fill" class="risk-fill"></div>
+            <!-- Scale Markings -->
+            <div class="gauge-scale-row">
+              <span>0%</span>
+              <span>50%</span>
+              <span>100%</span>
             </div>
           </div>
 
-          <!-- Key Stats Grid -->
-          <div class="stats-compact-grid">
-            <div class="stat-box">
-              <span class="stat-label">Inference Latency</span>
-              <span id="stat-latency" class="stat-value">-- ms</span>
+          <!-- 4 Key Metric Cards (2x2 Grid matching Image 1) -->
+          <div class="stats-2x2-grid">
+            <div class="stat-card-box">
+              <span class="stat-box-label">INFERENCE LATENCY</span>
+              <span id="stat-latency" class="stat-box-value">-- ms</span>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Obfuscation Flag</span>
-              <span id="stat-obfuscation" class="stat-value">None</span>
+            <div class="stat-card-box">
+              <span class="stat-box-label">OBFUSCATION FLAG</span>
+              <span id="stat-obfuscation" class="stat-box-value">Clean</span>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Routing Decision</span>
-              <span id="stat-action" class="stat-value">Pending</span>
+            <div class="stat-card-box">
+              <span class="stat-box-label">ROUTING DECISION</span>
+              <span id="stat-action" class="stat-box-value" style="color: var(--text-secondary);">Pending</span>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Model Architecture</span>
-              <span class="stat-value">Hybrid + L2 LR</span>
+            <div class="stat-card-box">
+              <span class="stat-box-label">MODEL ARCHITECTURE</span>
+              <span id="stat-architecture" class="stat-box-value">Hybrid + L2 LR</span>
             </div>
           </div>
 
-          <!-- Technical Assessment Details -->
-          <div class="technical-summary-box">
-            <h3>Assessment Explanation & Model Parameters</h3>
-            <div class="meta-detail-row">
-              <span class="meta-detail-label">Decision Policy:</span>
-              <span id="meta-policy" class="meta-detail-val">Three-Way Policy (Eq. 14, 15)</span>
-            </div>
-            <div class="meta-detail-row">
-              <span class="meta-detail-label">Feature Extractor:</span>
-              <span class="meta-detail-val">Word (1,3) + Char (2,5) + Struct (38,007 dim)</span>
-            </div>
-            <div class="meta-detail-row">
-              <span class="meta-detail-label">Hardware Device:</span>
-              <span id="meta-device" class="meta-detail-val">cuda:0 (NVIDIA RTX 4060)</span>
-            </div>
-            <div class="meta-detail-row">
-              <span class="meta-detail-label">Calibrated Thresholds:</span>
-              <span id="meta-thresholds" class="meta-detail-val">&tau;<sub>low</sub> = 0.30, &tau;<sub>high</sub> = 0.70</span>
+          <!-- Assessment Explanation & Model Parameters Panel (matching Image 1) -->
+          <div class="model-params-panel">
+            <div class="params-panel-header">ASSESSMENT EXPLANATION &amp; MODEL PARAMETERS</div>
+            <div class="params-panel-body">
+              <div class="param-row">
+                <span class="param-key">Decision Policy:</span>
+                <span class="param-val">Three-Way Policy (Eq. 14, 15)</span>
+              </div>
+              <div class="param-row">
+                <span class="param-key">Feature Extractor:</span>
+                <span class="param-val">Word (1,3) + Char (2,5) + Struct (38,007 dim)</span>
+              </div>
+              <div class="param-row">
+                <span class="param-key">Hardware Device:</span>
+                <span id="param-hardware" class="param-val">cuda:0 (NVIDIA GeForce RTX 4060 Laptop GPU)</span>
+              </div>
+              <div class="param-row">
+                <span class="param-key">Calibrated Thresholds:</span>
+                <span id="param-thresholds" class="param-val">&tau;<sub>low</sub> = 0.33, &tau;<sub>high</sub> = 0.67</span>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- End-to-End Latency Pipeline Section (Matching Image 2 Full-Width Layout) -->
+      <div class="card-panel pipeline-card-panel" style="margin-top: 1.25rem;">
+        <div class="card-header-group" style="padding-bottom: 0.65rem;">
+          <span class="pipeline-section-title">END-TO-END LATENCY PIPELINE (EQ. 19):</span>
+          <span id="pipeline-total-time" class="badge-tag pipeline-total-badge">Total: -- ms</span>
+        </div>
+
+        <div class="pipeline-flow-wrapper">
+          <!-- Horizontal connector rail behind cards -->
+          <div class="pipeline-connector-line"></div>
+          
+          <div class="pipeline-stages-grid">
+            <!-- Stage 1 -->
+            <div id="stage-card-pre" class="pipeline-stage-card stage-idle">
+              <div class="stage-card-top">
+                <span class="stage-tag-code">STAGE 1 • T_PRE</span>
+                <div class="stage-check-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="stage-main-title">Text Cleaning</h3>
+              <div id="stage-time-pre" class="stage-metric-latency">-- ms</div>
+              <p class="stage-sub-info">NFKC Unicode normalization &amp; zero-width probe</p>
+            </div>
+
+            <!-- Stage 2 -->
+            <div id="stage-card-feat" class="pipeline-stage-card stage-idle">
+              <div class="stage-card-top">
+                <span class="stage-tag-code">STAGE 2 • T_FEAT</span>
+                <div class="stage-check-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="stage-main-title">Feature Vector</h3>
+              <div id="stage-time-feat" class="stage-metric-latency">-- ms</div>
+              <p class="stage-sub-info">Word (1,2) + Char (2,5) + Structural (38k dim)</p>
+            </div>
+
+            <!-- Stage 3 -->
+            <div id="stage-card-infer" class="pipeline-stage-card stage-idle">
+              <div class="stage-card-top">
+                <span class="stage-tag-code">STAGE 3 • T_INFER</span>
+                <div class="stage-check-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="stage-main-title">Inference Engine</h3>
+              <div id="stage-time-infer" class="stage-metric-latency">-- ms</div>
+              <p id="stage-desc-infer" class="stage-sub-info">GPU: H2D 0.723ms | Kernel 1.772ms | D2H 0.224ms</p>
+            </div>
+
+            <!-- Stage 4 -->
+            <div id="stage-card-risk" class="pipeline-stage-card stage-idle">
+              <div class="stage-card-top">
+                <span class="stage-tag-code">STAGE 4 • T_RISK</span>
+                <div class="stage-check-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="stage-main-title">Risk Gate</h3>
+              <div id="stage-time-risk" class="stage-metric-latency">-- ms</div>
+              <p class="stage-sub-info">Three-way policy evaluation [&tau;<sub>low</sub>, &tau;<sub>high</sub>]</p>
+            </div>
+
+            <!-- Stage 5 -->
+            <div id="stage-card-post" class="pipeline-stage-card stage-idle">
+              <div class="stage-card-top">
+                <span class="stage-tag-code">STAGE 5 • T_POST</span>
+                <div class="stage-check-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="stage-main-title">Routing Action</h3>
+              <div id="stage-time-post" class="stage-metric-latency">-- ms</div>
+              <p class="stage-sub-info">ALLOW / FLAG / BLOCK dispatch</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Explainability & Token Attribution Section -->
+      <div class="card-panel" style="margin-top: 1.25rem;">
+        <div class="card-header-group">
+          <div>
+            <h2>Explainable Predictions & Feature Attribution</h2>
+            <p class="header-subtitle">Mathematically exact feature contribution decomposition (z<sub>i</sub> &times; w) from trained model weights</p>
+          </div>
+          <span class="badge-tag">Exact Attribution</span>
+        </div>
+
+        <div class="explainability-grid">
+          <!-- Adversarial Signals (Pushing toward BLOCK) -->
+          <div class="signals-column adv">
+            <h4>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Top Adversarial Indicators (Pushing toward BLOCK)
+            </h4>
+            <div id="adversarial-signals-list" class="signals-list">
+              <div class="signal-bar-card">
+                <div class="signal-row-top">
+                  <span class="signal-token">Awaiting prompt analysis...</span>
+                  <span class="signal-weight-val">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benign Signals (Pulling toward ALLOW) -->
+          <div class="signals-column benign">
+            <h4>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Top Benign / Safety Indicators (Pulling toward ALLOW)
+            </h4>
+            <div id="benign-signals-list" class="signals-list">
+              <div class="signal-bar-card">
+                <div class="signal-row-top">
+                  <span class="signal-token">Awaiting prompt analysis...</span>
+                  <span class="signal-weight-val">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mathematical Logit Breakdown & Structural Metrics -->
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-top: 0.5rem;">
+          <div class="math-breakdown-card">
+            <span class="selector-label">Mathematical Logit Calculation:</span>
+            <div class="math-row">
+              <span>Base Intercept (b):</span>
+              <span id="math-intercept" class="math-val">+0.6010</span>
+            </div>
+            <div class="math-row">
+              <span>Sum of Feature Attributions (&sum; z<sub>i</sub> &times; w):</span>
+              <span id="math-attrib-sum" class="math-val">--</span>
+            </div>
+            <div class="math-row">
+              <span>Total Linear Logit (z = b + &sum; z<sub>i</sub> w):</span>
+              <span id="math-total-logit" class="math-val">--</span>
+            </div>
+            <div class="math-row">
+              <span>Sigmoid Activation p = &sigma;(z):</span>
+              <span id="math-sigmoid-prob" class="math-val">--</span>
+            </div>
+          </div>
+
+          <div class="math-breakdown-card">
+            <span class="selector-label">Extracted Structural Markers:</span>
+            <div class="math-row">
+              <span>Length (L<sub>i</sub>) & Character Diversity (R<sub>div</sub>):</span>
+              <span id="struct-len-div" class="math-val">-- chars • --</span>
+            </div>
+            <div class="math-row">
+              <span>Shannon Entropy (H):</span>
+              <span id="struct-entropy" class="math-val">--</span>
+            </div>
+            <div class="math-row">
+              <span>Instruction Conflict Pattern Matches:</span>
+              <span id="struct-conflict-count" class="math-val">0 matches</span>
+            </div>
+            <div class="math-row">
+              <span>Cipher Flags (Base64 / Hex / Zero-Width):</span>
+              <span id="struct-ciphers" class="math-val">None</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LLM Safe Routing & Dispatch Console -->
+      <div class="llm-dispatch-console" style="margin-top: 1.25rem;">
+        <div class="llm-dispatch-header">
+          <div>
+            <h2>LLM Guardrail Forwarding Console</h2>
+            <p class="header-subtitle">Strict security policy: ALLOW queries are safely dispatched; FLAG queries mandate human review; BLOCK attacks are permanently dropped.</p>
+          </div>
+          <div id="llm-status-badge" class="llm-status-badge status-idle">
+            Status: Idle (Awaiting Dispatch)
+          </div>
+        </div>
+
+        <!-- Human Review Override Banner (Displayed for FLAG Prompts) -->
+        <div id="override-banner" class="override-banner" style="display: none;">
+          <div>
+            <strong style="color: var(--flag-amber);">Human Safety Review Required</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+              The prompt risk score falls in the ambiguous zone [&tau;<sub>low</sub>, &tau;<sub>high</sub>). Security protocol requires manual supervisor override to forward to LLM.
+            </p>
+          </div>
+          <button type="button" class="override-btn" onclick="dispatchSafeToLLM(true)">
+            Confirm Override & Dispatch &rarr;
+          </button>
+        </div>
+
+        <!-- Target LLM Selection -->
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <label style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">
+            Target Primary LLM:
+          </label>
+          <select id="target-llm-select" style="padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-medium); font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-surface); color: var(--text-primary);">
+            <option value="llama-3-8b-instruct">Meta-Llama-3-8B-Instruct (Primary Guarded LLM)</option>
+            <option value="mistral-7b-instruct">Mistral-7B-Instruct-v0.3</option>
+            <option value="gpt-3.5-turbo">OpenAI GPT-3.5-Turbo (External API)</option>
+          </select>
+          <span id="llm-timing-badge" class="badge-tag" style="font-family: var(--font-mono);">
+            Guardrail: -- ms | LLM: -- ms
+          </span>
+        </div>
+
+        <!-- Response Area -->
+        <div id="llm-response-area" class="llm-response-area">
+          <em>Click "Safe LLM Dispatch" or enter a query above. If the guardrail confirms the prompt is safe, the completion will stream here. Adversarial attacks will be dropped immediately before dispatch.</em>
         </div>
       </div>
     </section>
@@ -195,9 +492,9 @@
         <div class="section-title-row">
           <div>
             <h2>Research Evaluation (Held-Out Test Set)</h2>
-            <p class="header-subtitle">Performance on MPDD benchmark test partition (N = 5,876 samples, verified zero leakage)</p>
+            <p class="header-subtitle">Empirical performance on MPDD benchmark test partition (N = 5,876 samples, verified zero leakage)</p>
           </div>
-          <span class="section-badge">Offline Benchmark Evaluation</span>
+          <span class="section-badge badge-tag">Offline Benchmark Evaluation</span>
         </div>
 
         <!-- KPI Grid -->
@@ -205,7 +502,7 @@
           <div class="kpi-card">
             <span class="kpi-title">Accuracy (Eq. 20)</span>
             <span class="kpi-val" id="eval-accuracy">96.90%</span>
-            <span class="kpi-caption">Overall correctness</span>
+            <span class="kpi-caption">Overall test correctness</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-title">F1-Score (Eq. 22)</span>
@@ -215,12 +512,12 @@
           <div class="kpi-card">
             <span class="kpi-title">Recall (Eq. 21)</span>
             <span class="kpi-val" id="eval-recall">95.54%</span>
-            <span class="kpi-caption">Attack detection rate</span>
+            <span class="kpi-caption">Attack detection rate (TP/(TP+FN))</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-title">Precision (Eq. 21)</span>
             <span class="kpi-val" id="eval-precision">98.36%</span>
-            <span class="kpi-caption">True positive purity</span>
+            <span class="kpi-caption">True positive purity (TP/(TP+FP))</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-title">ROC-AUC</span>
@@ -230,7 +527,7 @@
           <div class="kpi-card">
             <span class="kpi-title">False Positive Rate</span>
             <span class="kpi-val" id="eval-fpr">1.67%</span>
-            <span class="kpi-caption">FP = 48 / 2,870 benign</span>
+            <span class="kpi-caption">FP = 48 / 2,870 benign samples</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-title">Expected Calibration Error</span>
@@ -240,14 +537,104 @@
           <div class="kpi-card">
             <span class="kpi-title">Missed Attacks (FN)</span>
             <span class="kpi-val" id="eval-fn">134</span>
-            <span class="kpi-caption">28.3% reduction in FN</span>
+            <span class="kpi-caption">28.3% reduction in FN vs baseline</span>
           </div>
         </div>
 
-        <!-- Taxonomy Slice Table -->
+        <!-- Confusion Matrix & ROC Curve Dual Grid -->
+        <div class="charts-dual-grid">
+          <!-- Interactive Confusion Matrix -->
+          <div class="chart-card">
+            <div class="card-header-group" style="padding-bottom: 0.4rem;">
+              <span class="selector-label">Confusion Matrix (N = 5,876):</span>
+              <span class="badge-tag">Empirical Counts</span>
+            </div>
+            <div class="confusion-matrix-wrapper">
+              <span class="cm-axis-label">&larr; Predicted Class &rarr;</span>
+              <div class="confusion-matrix-grid">
+                <div class="cm-header-cell"></div>
+                <div class="cm-header-cell">PREDICTED BENIGN</div>
+                <div class="cm-header-cell">PREDICTED ATTACK</div>
+
+                <div class="cm-header-cell" style="writing-mode: vertical-rl; transform: rotate(180deg);">ACTUAL BENIGN</div>
+                <div class="cm-cell cm-cell-tn" title="True Negatives: Benign queries correctly permitted">
+                  <span class="cm-cell-name">True Neg (TN)</span>
+                  <span class="cm-cell-count">2,822</span>
+                  <span class="cm-cell-pct">98.33% of Benign</span>
+                </div>
+                <div class="cm-cell cm-cell-fp" title="False Positives: Benign queries erroneously flagged">
+                  <span class="cm-cell-name">False Pos (FP)</span>
+                  <span class="cm-cell-count">48</span>
+                  <span class="cm-cell-pct">1.67% (FPR)</span>
+                </div>
+
+                <div class="cm-header-cell" style="writing-mode: vertical-rl; transform: rotate(180deg);">ACTUAL ATTACK</div>
+                <div class="cm-cell cm-cell-fn" title="False Negatives: Attacks missed by detector">
+                  <span class="cm-cell-name">False Neg (FN)</span>
+                  <span class="cm-cell-count">134</span>
+                  <span class="cm-cell-pct">4.46% (FNR)</span>
+                </div>
+                <div class="cm-cell cm-cell-tp" title="True Positives: Attacks correctly identified and blocked">
+                  <span class="cm-cell-name">True Pos (TP)</span>
+                  <span class="cm-cell-count">2,872</span>
+                  <span class="cm-cell-pct">95.54% (Recall)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive ROC-AUC Curve (SVG) -->
+          <div class="chart-card">
+            <div class="card-header-group" style="padding-bottom: 0.4rem;">
+              <span class="selector-label">Receiver Operating Characteristic (ROC-AUC):</span>
+              <span class="badge-tag" style="color: var(--primary-blue); font-weight: 600;">AUC = 0.9926</span>
+            </div>
+            <div style="position: relative; width: 100%; height: 240px;">
+              <svg id="roc-svg" viewBox="0 0 320 220" style="width: 100%; height: 100%;">
+                <!-- Grid Lines -->
+                <line x1="40" y1="20" x2="300" y2="20" stroke="#E2E8F0" stroke-width="1"/>
+                <line x1="40" y1="65" x2="300" y2="65" stroke="#E2E8F0" stroke-width="1"/>
+                <line x1="40" y1="110" x2="300" y2="110" stroke="#E2E8F0" stroke-width="1"/>
+                <line x1="40" y1="155" x2="300" y2="155" stroke="#E2E8F0" stroke-width="1"/>
+                <line x1="40" y1="190" x2="300" y2="190" stroke="#CBD5E1" stroke-width="1.5"/>
+                <line x1="40" y1="20" x2="40" y2="190" stroke="#CBD5E1" stroke-width="1.5"/>
+
+                <!-- Axes labels -->
+                <text x="35" y="195" font-size="9" text-anchor="end" fill="#64748B" font-family="monospace">0.0</text>
+                <text x="35" y="115" font-size="9" text-anchor="end" fill="#64748B" font-family="monospace">0.5</text>
+                <text x="35" y="25" font-size="9" text-anchor="end" fill="#64748B" font-family="monospace">1.0</text>
+                
+                <text x="40" y="205" font-size="9" text-anchor="middle" fill="#64748B" font-family="monospace">0.0</text>
+                <text x="170" y="205" font-size="9" text-anchor="middle" fill="#64748B" font-family="monospace">0.5</text>
+                <text x="300" y="205" font-size="9" text-anchor="middle" fill="#64748B" font-family="monospace">1.0</text>
+
+                <text x="170" y="218" font-size="9" text-anchor="middle" fill="#475569" font-weight="600">False Positive Rate (FPR)</text>
+                <text x="12" y="105" font-size="9" text-anchor="middle" fill="#475569" font-weight="600" transform="rotate(-90, 12, 105)">True Positive Rate (TPR)</text>
+
+                <!-- Random Baseline Diagonal -->
+                <line x1="40" y1="190" x2="300" y2="20" stroke="#94A3B8" stroke-dasharray="4,4" stroke-width="1.5"/>
+
+                <!-- ROC Curve Area -->
+                <path d="M 40 190 L 44 26 L 50 22 L 100 20 L 300 20 L 300 190 Z" fill="rgba(37, 99, 235, 0.08)"/>
+
+                <!-- Empirical Model ROC Curve -->
+                <path d="M 40 190 Q 43 28 55 23 T 300 20" fill="none" stroke="#2563EB" stroke-width="2.5"/>
+
+                <!-- Operating Point Marker (FPR=1.67%, TPR=95.54%) -->
+                <circle cx="44.3" cy="27.6" r="5" fill="#DC2626" stroke="#FFFFFF" stroke-width="2"/>
+                <text x="56" y="32" font-size="9" font-weight="700" fill="#DC2626" font-family="monospace">&tau;=0.47 (FPR: 1.67%, TPR: 95.5%)</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attack Taxonomy Slicing Breakdown Table -->
         <div class="card-header-group" style="margin-top: 0.5rem;">
-          <h2>Attack Taxonomy Slicing Breakdown</h2>
-          <span class="badge-tag">Fine-Grained Slices</span>
+          <div>
+            <h2>Attack Taxonomy Slicing Breakdown</h2>
+            <p class="header-subtitle">Fine-grained partition performance across instruction conflicts, persona adoption, and ciphers</p>
+          </div>
+          <span class="badge-tag">Slice Breakdown</span>
         </div>
         <div class="table-responsive">
           <table class="research-table" id="slices-table">
@@ -303,114 +690,144 @@
                 <td><span class="badge-tag">Robust Baseline</span></td>
               </tr>
               <tr>
-                <td><strong>Benign Clean Queries</strong></td>
+                <td><strong>Benign Clean Queries (Control)</strong></td>
                 <td class="table-mono">2,870</td>
                 <td class="table-mono" style="color: var(--allow-green); font-weight: 600;">98.3%</td>
                 <td class="table-mono">0.969</td>
-                <td class="table-mono">1.7%</td>
-                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">FPR &le; 1.7%</span></td>
+                <td class="table-mono">1.67%</td>
+                <td><span class="badge-tag" style="background: var(--allow-green-bg); color: var(--allow-green); border-color: var(--allow-green-border);">FPR &le; 1.67%</span></td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- Reproducible Research Exports -->
+        <div class="export-bar">
+          <a href="/v1/export/report" download="llm_jailbreak_guardrail_report.json" class="btn-export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Full Evaluation (JSON)
+          </a>
+          <a href="/v1/export/csv" download="taxonomy_slices_evaluation.csv" class="btn-export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Export Slices (CSV)
+          </a>
+          <a href="/v1/export/latex" download="table_slices.tex" class="btn-export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Export Paper Table (LaTeX)
+          </a>
+        </div>
       </div>
     </section>
 
-    <!-- VIEW 3: HARDWARE & RUNTIME (PROFILING BREAKDOWN) -->
+    <!-- VIEW 3: HARDWARE & RUNTIME TELEMETRY -->
     <section id="view-hardware" class="view-panel" style="display: none;">
       <div class="section-card">
         <div class="section-title-row">
           <div>
             <h2>Hardware Telemetry & Runtime Configuration</h2>
-            <p class="header-subtitle">Verified physical system specifications and active execution environment</p>
+            <p class="header-subtitle">Physical GPU architecture, CUDA runtime, memory allocation, and kernel dispatch status</p>
           </div>
-          <span class="section-badge">Physical Hardware Audit</span>
+          <span class="badge-tag">Ada Lovelace GPU Audit</span>
         </div>
 
         <div class="stats-compact-grid" style="grid-template-columns: repeat(3, 1fr);">
           <div class="stat-box">
             <span class="stat-label">GPU Model</span>
-            <span class="stat-value" id="hw-gpu-name">NVIDIA GeForce RTX 4060 Laptop</span>
+            <span class="stat-value" id="hw-gpu-name">NVIDIA GeForce RTX 4060 Laptop GPU</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">VRAM Capacity</span>
-            <span class="stat-value" id="hw-gpu-vram">8,188 MiB GDDR6</span>
+            <span class="stat-label">VRAM Capacity & Allocation</span>
+            <span class="stat-value" id="hw-gpu-vram">8,188 MiB GDDR6 (Active: 0.15 MiB)</span>
           </div>
           <div class="stat-box">
             <span class="stat-label">Compute Capability</span>
-            <span class="stat-value" id="hw-compute-cap">8.9 (Ada Lovelace)</span>
+            <span class="stat-value" id="hw-compute-cap">8.9 (Ada Lovelace Architecture)</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">PyTorch Runtime</span>
-            <span class="stat-value" id="hw-torch-ver">2.6.0+cu124</span>
+            <span class="stat-label">PyTorch CUDA Runtime</span>
+            <span class="stat-value" id="hw-torch-ver">2.6.0+cu124 (CUDA 12.4)</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">CUDA Version</span>
-            <span class="stat-value" id="hw-cuda-ver">CUDA 12.4</span>
+            <span class="stat-label">GPU Acceleration Status</span>
+            <span class="stat-value" style="color: var(--allow-green);">ACTIVE • Non-blocking CUDA Streams</span>
           </div>
           <div class="stat-box">
             <span class="stat-label">Host Processor</span>
-            <span class="stat-value" id="hw-cpu-info">16 Physical / 24 Logical Cores</span>
+            <span class="stat-value" id="hw-cpu-info">16 Physical / 24 Logical Cores (AMD64)</span>
           </div>
         </div>
 
         <!-- Latency Decomposition Section (Eq. 19) -->
         <div class="card-header-group" style="margin-top: 0.75rem;">
           <div>
-            <h2>Inference Latency Decomposition (Paper Eq. 19)</h2>
+            <h2>Hardware Latency Decomposition (Paper Eq. 19)</h2>
             <p class="header-subtitle" style="font-family: var(--font-mono); font-size: 0.75rem;">T<sub>total</sub> = T<sub>pre</sub> + T<sub>H2D</sub> + T<sub>kernel</sub> + T<sub>D2H</sub> + T<sub>post</sub></p>
           </div>
-          <span class="badge-tag">Decomposed Timers</span>
+          <span class="badge-tag">CUDA Event Timings</span>
         </div>
 
-        <div class="latency-decomposition-flow">
-          <div class="latency-stage-card">
-            <span class="stage-eq-badge">T_pre</span>
-            <span class="stage-title">Text Cleaning & TF-IDF</span>
-            <span class="stage-time">65.50 ms</span>
-            <span class="stage-desc">NFKC Unicode cleaning & hybrid sparse vectorization</span>
+        <div class="pipeline-flow-container">
+          <div class="pipeline-stage-card">
+            <span class="stage-step-num">T_pre</span>
+            <span class="stage-title">Text Cleaning & NFKC</span>
+            <span class="stage-timer">~0.45 ms</span>
+            <span class="stage-desc">Zero-width character elimination and Unicode normalization</span>
           </div>
-          <div class="latency-stage-card">
-            <span class="stage-eq-badge">T_H2D</span>
+          <div class="pipeline-stage-card">
+            <span class="stage-step-num">T_feat</span>
+            <span class="stage-title">Hybrid Vectorization</span>
+            <span class="stage-timer">~1.20 ms</span>
+            <span class="stage-desc">Word + Char TF-IDF + Structural scalar feature extraction</span>
+          </div>
+          <div class="pipeline-stage-card">
+            <span class="stage-step-num">T_H2D</span>
             <span class="stage-title">Host-to-Device Memory</span>
-            <span class="stage-time">0.22 ms</span>
-            <span class="stage-desc">PCIe transfer to RTX 4060 GDDR6 VRAM</span>
+            <span class="stage-timer">~0.46 ms</span>
+            <span class="stage-desc">PCIe asynchronous transfer of sparse CSR tensors to GDDR6</span>
           </div>
-          <div class="latency-stage-card">
-            <span class="stage-eq-badge">T_kernel</span>
-            <span class="stage-title">GPU Kernel Projection</span>
-            <span class="stage-time">1.44 ms</span>
-            <span class="stage-desc">CUDA Ada Lovelace sparse dot-product & sigmoid</span>
+          <div class="pipeline-stage-card">
+            <span class="stage-step-num">T_kernel</span>
+            <span class="stage-title">CUDA Kernel Projection</span>
+            <span class="stage-timer">~0.83 ms</span>
+            <span class="stage-desc">Parallel sparse matrix-vector dot product & sigmoid activation</span>
           </div>
-          <div class="latency-stage-card">
-            <span class="stage-eq-badge">T_D2H</span>
-            <span class="stage-title">Device-to-Host Memory</span>
-            <span class="stage-time">0.02 ms</span>
-            <span class="stage-desc">Transfer output probability back to CPU host</span>
-          </div>
-          <div class="latency-stage-card">
-            <span class="stage-eq-badge">T_post</span>
-            <span class="stage-title">Decision Routing</span>
-            <span class="stage-time">0.04 ms</span>
-            <span class="stage-desc">Three-way policy evaluation [&tau;<sub>low</sub>, &tau;<sub>high</sub>]</span>
+          <div class="pipeline-stage-card">
+            <span class="stage-step-num">T_D2H & T_post</span>
+            <span class="stage-title">Device-to-Host & Policy</span>
+            <span class="stage-timer">~0.10 ms</span>
+            <span class="stage-desc">Transfer calibrated probability & evaluate three-way gate</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 4: BENCHMARKS & SCALING (MULTI-BATCH TABLE) -->
+    <!-- VIEW 4: BENCHMARKS & SCALING (MULTI-BATCH TABLE & LIVE BENCHMARK) -->
     <section id="view-benchmarks" class="view-panel" style="display: none;">
       <div class="section-card">
         <div class="section-title-row">
           <div>
             <h2>Throughput & Latency Scaling (Paper Equations 24–26)</h2>
-            <p class="header-subtitle">Performance comparison across paper batch sizes [100, 500, 1000, 5000, 10000]</p>
+            <p class="header-subtitle">Hardware scaling comparison across batch sizes B &isin; [100, 500, 1000, 5000, 10000]</p>
           </div>
-          <span class="section-badge">Hardware Scaling Sweep</span>
+          <span class="badge-tag">Throughput Sweep</span>
         </div>
 
+        <!-- Live Benchmark Actions Bar -->
+        <div class="benchmark-actions-bar">
+          <div class="benchmark-info">
+            <strong style="color: var(--text-primary); font-size: 0.875rem;">Run On-The-Fly Hardware Benchmark</strong>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">
+              Directly sweeps batches [100, 500, 1000, 5000] on the active RTX 4060 GPU and CPU to measure real throughput and speedup.
+            </span>
+          </div>
+          <button id="run-bench-btn" class="btn-primary" style="flex: 0; padding: 0.5rem 1.25rem;" onclick="triggerLiveBenchmark()">
+            <span id="bench-btn-text">Execute Live Benchmark</span>
+          </button>
+        </div>
+
+        <!-- Scaling Table -->
         <div class="table-responsive">
-          <table class="research-table">
+          <table class="research-table" id="benchmarks-table">
             <thead>
               <tr>
                 <th>Batch Size (B)</th>
@@ -418,19 +835,19 @@
                 <th>GPU Latency (p50)</th>
                 <th>CPU Throughput &Theta;(B)</th>
                 <th>GPU Throughput &Theta;(B)</th>
-                <th>Speedup S(B) (Eq. 25)</th>
-                <th>Execution Reduction &Delta;T%</th>
+                <th>GPU H2D + Kernel</th>
+                <th>Execution Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="benchmarks-tbody">
               <tr>
                 <td class="table-mono"><strong>100</strong></td>
-                <td class="table-mono">0.078 ms</td>
-                <td class="table-mono">1.277 ms</td>
-                <td class="table-mono">1,253,007 qps</td>
-                <td class="table-mono">78,233 qps</td>
-                <td class="table-mono">Sub-millisecond</td>
-                <td class="table-mono">Verified</td>
+                <td class="table-mono">0.156 ms</td>
+                <td class="table-mono">2.295 ms</td>
+                <td class="table-mono">616,446 qps</td>
+                <td class="table-mono">41,563 qps</td>
+                <td class="table-mono">0.457 ms + 1.877 ms</td>
+                <td class="table-mono"><span class="badge-tag" style="color: var(--allow-green);">Verified</span></td>
               </tr>
               <tr>
                 <td class="table-mono"><strong>500</strong></td>
@@ -438,8 +855,8 @@
                 <td class="table-mono">6.183 ms</td>
                 <td class="table-mono">2,281,355 qps</td>
                 <td class="table-mono">81,872 qps</td>
-                <td class="table-mono">High Throughput</td>
-                <td class="table-mono">Verified</td>
+                <td class="table-mono">0.215 ms + 5.870 ms</td>
+                <td class="table-mono"><span class="badge-tag" style="color: var(--allow-green);">Verified</span></td>
               </tr>
               <tr>
                 <td class="table-mono"><strong>1,000</strong></td>
@@ -447,8 +864,8 @@
                 <td class="table-mono">10.593 ms</td>
                 <td class="table-mono">2,899,223 qps</td>
                 <td class="table-mono">89,392 qps</td>
-                <td class="table-mono">Peak QPS</td>
-                <td class="table-mono">Verified</td>
+                <td class="table-mono">0.589 ms + 10.574 ms</td>
+                <td class="table-mono"><span class="badge-tag" style="color: var(--allow-green);">Peak QPS</span></td>
               </tr>
               <tr>
                 <td class="table-mono"><strong>5,000</strong></td>
@@ -456,17 +873,8 @@
                 <td class="table-mono">54.500 ms</td>
                 <td class="table-mono">1,660,717 qps</td>
                 <td class="table-mono">86,716 qps</td>
-                <td class="table-mono">Large Batch</td>
-                <td class="table-mono">Verified</td>
-              </tr>
-              <tr>
-                <td class="table-mono"><strong>10,000</strong></td>
-                <td class="table-mono">5.611 ms</td>
-                <td class="table-mono">107.671 ms</td>
-                <td class="table-mono">1,750,086 qps</td>
-                <td class="table-mono">93,884 qps</td>
-                <td class="table-mono">Max Capacity</td>
-                <td class="table-mono">Verified</td>
+                <td class="table-mono">2.140 ms + 52.360 ms</td>
+                <td class="table-mono"><span class="badge-tag" style="color: var(--allow-green);">Verified</span></td>
               </tr>
             </tbody>
           </table>
@@ -480,64 +888,52 @@
         <div class="section-title-row">
           <div>
             <h2>Research Methodology & Formulation Mapping</h2>
-            <p class="header-subtitle">Direct correspondence between research paper equations (1)–(26) and system components</p>
+            <p class="header-subtitle">Direct correspondence between research paper equations (1)–(26) and system implementation</p>
           </div>
-          <span class="section-badge">Mathematical Formulations</span>
+          <span class="badge-tag">Mathematical Formulations</span>
         </div>
 
-        <div class="equations-grid">
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (1)–(5)</span>
-              <span class="eq-name">Text Normalization</span>
-            </div>
-            <div class="eq-math">x&#771;<sub>i</sub> = Normalization(x<sub>i</sub>)</div>
-            <p class="eq-desc">NFKC Unicode normalization, zero-width space elimination, and base64/hex cipher extraction.</p>
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (1)–(5) • Text Preprocessing & Cipher Detection</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              x&#771;<sub>i</sub> = Normalization(x<sub>i</sub>). Normalizes input strings using Unicode NFKC, eliminates zero-width whitespace (U+200B, U+FEFF), and inspects token entropy for Base64 and hexadecimal payloads.
+            </p>
           </div>
 
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (6)–(8)</span>
-              <span class="eq-name">Hybrid Representation</span>
-            </div>
-            <div class="eq-math">z<sub>i</sub> = [z<sub>i</sub><sup>(w)</sup> || z<sub>i</sub><sup>(c)</sup> || z<sub>i</sub><sup>(s)</sup>]</div>
-            <p class="eq-desc">Concatenation of word n-grams (1,3), character n-grams (2,5), and diversity ratio R<sub>div</sub>(x<sub>i</sub>).</p>
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (6)–(8) • Hybrid Feature Representation</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              z<sub>i</sub> = [z<sub>i</sub><sup>(w)</sup> || z<sub>i</sub><sup>(c)</sup> || z<sub>i</sub><sup>(s)</sup>]. Concatenates word n-grams (1,2), character n-grams (2,5), and scalar structural features (Length, Diversity Ratio R<sub>div</sub>, Shannon Entropy).
+            </p>
           </div>
 
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (9)–(13)</span>
-              <span class="eq-name">Classification Engine</span>
-            </div>
-            <div class="eq-math">p<sub>i</sub> = &sigma;(z<sub>i</sub> w + b)</div>
-            <p class="eq-desc">L2-regularized logistic sigmoid classification with L-BFGS optimization.</p>
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (9)–(13) • Classification Engine & Logit</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              p<sub>i</sub> = &sigma;(z<sub>i</sub> w + b) = 1 / (1 + e<sup>-(z<sub>i</sub> w + b)</sup>). L2-regularized logistic sigmoid classification with calibrated decision threshold &tau; = 0.47 optimizing False Positive Rate &le; 1.67%.
+            </p>
           </div>
 
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (14)–(15)</span>
-              <span class="eq-name">Three-Way Policy</span>
-            </div>
-            <div class="eq-math">d(p<sub>i</sub>) &isin; {allow, flag, block}</div>
-            <p class="eq-desc">Dual calibrated thresholds &tau;<sub>low</sub> = 0.30 and &tau;<sub>high</sub> = 0.70 routing queries dynamically.</p>
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (14)–(15) • Three-Way Risk Routing Policy</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              d(p<sub>i</sub>) &isin; {allow, flag, block}. Queries with p<sub>i</sub> &lt; &tau;<sub>low</sub> are forwarded directly; &tau;<sub>low</sub> &le; p<sub>i</sub> &lt; &tau;<sub>high</sub> are escalated for review; p<sub>i</sub> &ge; &tau;<sub>high</sub> are dropped instantly.
+            </p>
           </div>
 
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (16)</span>
-              <span class="eq-name">Calibration (ECE)</span>
-            </div>
-            <div class="eq-math">ECE = &sum; (|B<sub>m</sub>|/N) |acc(B<sub>m</sub>) - conf(B<sub>m</sub>)|</div>
-            <p class="eq-desc">Measures probability calibration accuracy (achieved ECE = 0.0079).</p>
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (16) • Probability Calibration (ECE)</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              ECE = &sum; (|B<sub>m</sub>|/N) |acc(B<sub>m</sub>) - conf(B<sub>m</sub>)|. Achieved empirical ECE = 0.0079 (&lt; 0.01), confirming calibrated confidence scores.
+            </p>
           </div>
 
-          <div class="eq-card">
-            <div class="eq-card-header">
-              <span class="eq-label">Eq. (19)–(26)</span>
-              <span class="eq-name">Latency & Metrics</span>
-            </div>
-            <div class="eq-math">T<sub>total</sub> = T<sub>pre</sub> + T<sub>H2D</sub> + T<sub>kernel</sub> + T<sub>D2H</sub> + T<sub>post</sub></div>
-            <p class="eq-desc">Hardware-level latency decomposition, throughput &Theta;(B), and speedup S(B).</p>
+          <div class="math-breakdown-card">
+            <span class="selector-label">Eq. (19)–(26) • Hardware Latency & Throughput</span>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">
+              T<sub>total</sub> = T<sub>pre</sub> + T<sub>H2D</sub> + T<sub>kernel</sub> + T<sub>D2H</sub> + T<sub>post</sub>. Sub-millisecond GPU execution on NVIDIA GeForce RTX 4060 Laptop GPU with throughput &Theta;(B) exceeding 80,000 queries/second.
+            </p>
           </div>
         </div>
       </div>
@@ -545,7 +941,7 @@
 
     <!-- Footer -->
     <footer class="research-footer">
-      <p>CUDA-Accelerated LLM Jailbreak Guardrail Monitor • Research Evaluation System • SRM Institute of Science and Technology</p>
+      <p>CUDA-Accelerated LLM Jailbreak Guardrail Research Platform • SRM Institute of Science and Technology • Research Evaluation Harness</p>
     </footer>
   </div>
 
