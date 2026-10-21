@@ -30,11 +30,8 @@ venv.bak/
 
 # Datasets and local data (strictly prevent committing raw/processed dataset payloads)
 data/raw/*
-!data/raw/.gitkeep
 data/processed/*
-!data/processed/.gitkeep
 data/splits/*
-!data/splits/.gitkeep
 *.csv
 *.tsv
 *.jsonl
@@ -56,15 +53,13 @@ data/splits/*
 *.engine
 *.trt
 models/weights/*
-!models/weights/.gitkeep
 checkpoints/
 saved_models/
 
-# Experiment outputs, metrics, and figures (only keep docs and gitkeeps tracked)
+# Experiment outputs, metrics, and figures
 results/metrics/*
-!results/metrics/.gitkeep
 results/figures/*
-!results/figures/.gitkeep
+
 runs/
 wandb/
 .tensorboard/
