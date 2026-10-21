@@ -1,72 +1,112 @@
-# Research Methodology & Experimental Protocol
+# Research Methodology & Mathematical Formulation
 
-## 1. Problem Formulation
-
-As Large Language Models (LLMs) are deployed in critical workflows, adversaries exploit vulnerabilities in the instruction-following mechanism. In this project, we specifically target two prevalent and evasive attack classes:
-1. **Instruction-Conflict Jailbreaks**: Prompts designed to pit system-level safety instructions against adversarial user constraints (e.g., "Ignore previous instructions", "From now on, you are in Developer Mode", prefix injections, and conflicting role definitions).
-2. **Obfuscation-Based Jailbreaks**: Prompts that disguise malicious intent through transformation techniques (e.g., Base64 encoding, ROT13/Caesar ciphers, character-level leetspeak, Morse code, multi-lingual translation interleaving, and Unicode homoglyphs).
-
-### Classification Objective
-Given an input prompt $x \in \mathcal{X}$, predict binary label $y \in \{0, 1\}$:
-$$y = \begin{cases} 0 & \text{if } x \text{ is benign / policy-compliant} \\ 1 & \text{if } x \text{ contains an instruction-conflict or obfuscation jailbreak} \end{cases}$$
-along with a calibrated probability $P(y=1 \mid x)$ and categorical taxonomy attribution.
+**Paper Title**: *CUDA-Accelerated Detection of Instruction-Conflict and Obfuscation-Based Jailbreak Prompts in Large Language Models*  
+**Authors**: Mutthuram S R, P.T. Rangesh Pandian, Aanish Nithin A, Kavitha R  
+**Affiliation**: SRM Institute of Science and Technology, Kattankulathur, Chennai, India  
 
 ---
 
-## 2. Phased Research Execution
+## 1. Dataset & Problem Formulation (Section III-A)
 
-### Phase 1: Environment & Framework Setup
-- Establish clean directory hierarchy, verification harnesses, and environment isolation.
-- Verify hardware acceleration capabilities (PyTorch CUDA runtime, GPU memory limits, compute capability).
+Given a dataset of prompts $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^N$ (Eq. 1), where:
+- $x_i$ is an input text prompt,
+- $y_i \in \{0, 1\}$ is its binary security label ($y_i = 0$ for benign, $y_i = 1$ for malicious jailbreak attempts).
 
-### Phase 2: Transparent CPU Baseline & Data Integrity
-- Curate and audit public jailbreak datasets (JailbreakBench, AdvGLUE, BeaverTails/HarmfulQA, WildJailbreak).
-- Strict provenance logging and de-duplication across prompt templates to prevent train-test data leakage.
-- Implement a reproducible CPU baseline:
-  - Text preprocessing and normalization.
-  - Sublinear TF-IDF vectorizer (unigrams + bigrams, $V \approx 20{,}000$).
-  - L2-regularized Logistic Regression / Linear SVM.
-- Evaluate standard classification metrics and latency.
+The class proportion is given by:
+$$P(c) = \frac{N_c}{N} \quad (2)$$
 
-### Phase 3: Bottleneck Profiling & GPU Acceleration
-- Profile the CPU baseline:
-  - String normalization & regex tokenization time vs. vectorization vs. linear projection.
-- Distinguish GPU operational layers:
-  1. **Standard PyTorch GPU Tensor Operations**: cuBLAS batch matrix-vector multiplications, embedding lookups, GPU tensor transformations.
-  2. **Custom CUDA Kernels (`.cu`)**: Parallel regex / subword pattern scanning, parallel cipher / character entropy calculations, or fused sparse feature extraction.
-- Measure latency ($p50, p95, p99$) and throughput (QPS) across batch sizes $B \in \{1, 8, 16, 32, 64, 128\}$.
-
-### Phase 4: System Integration & Application
-- Encapsulate detection engine into an asynchronous FastAPI service with GPU stream batching.
-- Modern dashboard UI for live prompt auditing and latency benchmarking.
+The dataset is partitioned into pairwise-disjoint subsets:
+$$\mathcal{D} = \mathcal{D}_{train} \cup \mathcal{D}_{val} \cup \mathcal{D}_{test} \quad (3)$$
+Exact and near-duplicate prompts are investigated and handled prior to splitting to prevent data leakage across subsets.
 
 ---
 
-## 3. Evaluation Metrics
+## 2. Text Preprocessing (Section III-B)
 
-Because safety guardrails operate in production where >99% of user traffic is benign, **False Positive Rate (FPR)** is as critical as Recall:
-- **Accuracy**: Overall fraction of correct classifications.
-- **Precision**: $\frac{TP}{TP + FP}$ — avoiding false alarms on benign queries.
-- **Recall (Detection Rate)**: $\frac{TP}{TP + FN}$ — catching true jailbreaks.
-- **F1-Score**: Harmonic mean of Precision and Recall.
-- **FPR at 99% Recall / Fixed FPR Thresholds**: False Positive Rate when operating at strict safety thresholds.
-- **Confusion Matrix**: Full breakdown of TP, FP, TN, FN across attack categories.
+Each prompt is represented as a character sequence:
+$$x_i = (c_1, c_2, \dots, c_{L_i}) \quad (4)$$
+Preprocessing applies a sanitization and normalization operator:
+$$\tilde{x}_i = \mathcal{P}(x_i) \quad (5)$$
+Crucially, unusual characters and formatting (such as Base64 strings, zero-width characters, and non-alphanumeric symbols) are preserved rather than indiscriminately stripped, because they carry key adversarial obfuscation signals.
 
 ---
 
-## 4. Hardware Profiling & Timing Standards
+## 3. Combined Feature Representation (Section III-C)
 
-To prevent false claims of speedup:
-- **Warmup**: Discard the first 10-20 iterations to account for driver initialization, CUDA context creation, and kernel JIT compilation.
-- **Synchronization**: Wrap all timed GPU sections with:
-  ```python
-  start_event = torch.cuda.Event(enable_timing=True)
-  end_event = torch.cuda.Event(enable_timing=True)
-  start_event.record()
-  # ... GPU operations ...
-  end_event.record()
-  torch.cuda.synchronize()
-  elapsed_ms = start_event.elapsed_time(end_event)
-  ```
-- **Repeatability**: Run at least 100 trials and report median, standard deviation, and percentiles.
-- **System Telemetry**: Track host RAM (`psutil`), GPU VRAM allocated vs reserved (`torch.cuda.memory_allocated`, `torch.cuda.memory_reserved`), and compute utilization.
+To capture multiple complementary adversarial indicators, features combine word-level, character-level, and structural signals:
+$$\mathbf{z}_i = \left[ \mathbf{z}_i^{(w)} \parallel \mathbf{z}_i^{(c)} \parallel \mathbf{z}_i^{(s)} \right] \quad (6)$$
+
+Where:
+1. **Word-level component $\mathbf{z}_i^{(w)}$**: Token n-gram patterns weighted via sublinear TF-IDF:
+   $$\text{tfidf}(t, i) = \text{tf}(t, i) \cdot \log\left(\frac{N + 1}{\text{df}(t) + 1}\right) \quad (7)$$
+2. **Character-level component $\mathbf{z}_i^{(c)}$**: Character n-grams capturing obfuscation, subwords, and leetspeak artifacts.
+3. **Structural component $\mathbf{z}_i^{(s)}$**: Prompt metadata including the character-diversity ratio:
+   $$R_{div}(x_i) = \frac{|\{c : c \in x_i\}|}{L_i}, \quad L_i > 0 \quad (8)$$
+   alongside prompt length $L_i$, non-alphanumeric ratio, Shannon entropy, and instruction-conflict pattern matches.
+
+---
+
+## 4. Machine-Learning Classifier (Section III-D)
+
+The detector estimates malicious risk probability:
+$$p_i = f_\theta(\mathbf{z}_i), \quad p_i \in [0, 1] \quad (9)$$
+
+Using an L2-regularized Logistic Regression baseline:
+$$p_i = \sigma(\mathbf{w}^T \mathbf{z}_i + b) \quad (10)$$
+$$\sigma(a) = \frac{1}{1 + \exp(-a)} \quad (11)$$
+
+Optimized via binary cross-entropy with L2 penalty:
+$$\mathcal{L}(\theta) = -\frac{1}{N_{train}} \sum_{i=1}^{N_{train}} \left[ y_i \log p_i + (1 - y_i) \log(1 - p_i) \right] \quad (12)$$
+$$\mathcal{L}_{reg} = \mathcal{L}(\theta) + \lambda \|\mathbf{w}\|_2^2 \quad (13)$$
+where regularization strength $\lambda$ (or $C = \frac{1}{2\lambda}$) is tuned on validation data.
+
+---
+
+## 5. Three-Way Risk Decision Policy & Calibration (Section III-E)
+
+To support practical deployment where uncertain queries require human review or secondary LLM gatekeeping, a three-way decision policy is defined:
+$$d(p_i) = \begin{cases} \text{allow}, & p_i < \tau_{low} \\ \text{flag}, & \tau_{low} \le p_i < \tau_{high} \\ \text{block}, & p_i \ge \tau_{high} \end{cases} \quad (14)$$
+subject to:
+$$0 \le \tau_{low} < \tau_{high} \le 1 \quad (15)$$
+
+Confidence calibration is evaluated via Expected Calibration Error (ECE) across $M$ bins:
+$$\text{ECE} = \sum_{m=1}^M \frac{|S_m|}{n} |\text{acc}(S_m) - \text{conf}(S_m)| \quad (16)$$
+
+---
+
+## 6. CUDA-Accelerated Execution & Latency Decomposition (Section III-F)
+
+For a batch of $B$ prompts $\mathbf{Z} = \mathcal{F}(\tilde{x}_1, \dots, \tilde{x}_B)$ (Eq. 17), threads map to samples using the global 1D index:
+$$i = \text{blockIdx.x} \cdot \text{blockDim.x} + \text{threadIdx.x} \quad (18)$$
+
+End-to-end inference latency is decomposed into:
+$$T_{total} = T_{pre} + T_{H2D} + T_{kernel} + T_{D2H} + T_{post} \quad (19)$$
+where:
+- $T_{pre}$: Text cleaning, tokenization, and feature extraction.
+- $T_{H2D}$: Host-to-Device tensor transfer across PCIe bus.
+- $T_{kernel}$: CUDA kernel execution time on GPU streaming multiprocessors.
+- $T_{D2H}$: Device-to-Host transfer of predicted probabilities.
+- $T_{post}$: Decision policy post-processing ($allow, flag, block$).
+
+---
+
+## 7. Detection Metrics (Section III-G)
+
+$$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN} \quad (20)$$
+$$\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN} \quad (21)$$
+$$F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} \quad (22)$$
+$$\text{Positive Prediction Rate: } R_{positive} = \frac{TP + FP}{TP + TN + FP + FN} \quad (23)$$
+
+Macro-averaged F1 and class-wise precision/recall/F1 are reported alongside False Positive Rate (FPR) at low false-alarm operating points.
+
+---
+
+## 8. Computational Performance Metrics (Section III-H)
+
+For batch size $B$ processed in time $T$:
+$$\text{Throughput: } \Theta = \frac{B}{T} \quad (24) \quad [\text{prompts/second}]$$
+$$\text{GPU Speedup: } S(B) = \frac{T_{CPU}(B)}{T_{GPU}(B)} \quad (25)$$
+$$\text{Percentage Reduction in Execution Time: } \Delta T(\%) = \frac{T_{CPU} - T_{GPU}}{T_{CPU}} \times 100 \quad (26)$$
+
+Evaluated across batch sizes $B \in \{100, 500, 1000, 5000, 10000\}$ using warm-up runs, CUDA synchronization, and repeated trials reporting mean and standard deviation.
+
